@@ -8,6 +8,14 @@ class Map
     private $column = 0;
     private $row = 0;
 
+    private $isFirstAddOfRow = true;
+
+    public function set($content)
+    {
+        $this->map[$this->getRow()][$this->getColumn()] = $content;
+        $this->isFirstAddOfRow = false;
+    }
+
     /**
      * @param $content
      *
@@ -15,9 +23,11 @@ class Map
      */
     public function add($content)
     {
-        $this->nextColumn();
-
-        $this->map[$this->getColumn()][$this->getRow()] = $content;
+        if (!$this->isFirstAddOfRow) {
+            $this->nextcolumn();
+        }
+        $this->isFirstAddOfRow = false;
+        $this->set($content);
 
         return $this;
     }
@@ -28,11 +38,10 @@ class Map
     public function get()
     {
         if($this->currentSlotIsEmpty()) {
-
             return false;
         }
 
-        return $this->map[$this->getColumn()][$this->getRow()];
+        return $this->map[$this->getRow()][$this->getColumn()];
     }
 
     /**
@@ -64,7 +73,7 @@ class Map
      */
     public function getColumn()
     {
-        return $this->column;
+        return (int)$this->column;
     }
 
     /**
@@ -93,8 +102,9 @@ class Map
     public function nextRow($keepColumn = false)
     {
         $this->row++;
-        if (false !== $keepColumn) {
+        if (true !== $keepColumn) {
             $this->column = 0;
+            $this->isFirstAddOfRow = true;
         }
 
         return $this;
@@ -108,6 +118,11 @@ class Map
         $column = $this->getColumn();
         $row    = $this->getRow();
 
-        return (array_key_exists($column, $this->map) && array_key_exists($row, $this->map[$column]));
+        return (!array_key_exists($row, $this->map) || !array_key_exists($column, $this->map[$row]));
+    }
+
+    public function debug()
+    {
+        return $this->map;
     }
 }
