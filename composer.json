@@ -1,7 +1,24 @@
 {
     "name": "yoanm/DataMappingBundle",
     "description": "Allows data mapping into a table structure",
-    "require": {
-        "php": ">=5.3.0"
-    }
+    "type" : "symfony-bundle",
+    "authors" : [{
+        "name" : "yoanm",
+        "email" : "yoan.mayerau@gmail.com"
+    }],
+    "keywords" : [
+        "data mapping table structure"
+    ],
+    "license" : [
+        "GPL V2"
+    ],
+    "require" : {
+	"php": ">=5.3.0"
+    },
+    "autoload" : {
+        "psr-0" : {
+            "Yoanm\\DataMappingBundle" : ""
+        }
+    },
+    "target-dir" : "Yoanm/DataMappingBundle",
 }
