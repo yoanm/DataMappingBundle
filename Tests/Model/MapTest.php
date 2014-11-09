@@ -153,4 +153,4 @@ class MapTest extends ProphecyTestCase
             )
         );
     }
-} 
+}

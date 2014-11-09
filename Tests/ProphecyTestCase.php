@@ -30,4 +30,4 @@ class ProphecyTestCase extends \PHPUnit_Framework_TestCase
         return $this->prophet->prophesize($className);
     }
 
-} 
+}
