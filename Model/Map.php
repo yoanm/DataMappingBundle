@@ -8,12 +8,12 @@ class Map
     private $column = 0;
     private $row = 0;
 
-    private $isFirstAddOfRow = true;
+    private $isFirstSetOfRow = true;
 
     public function set($content)
     {
         $this->map[$this->getRow()][$this->getColumn()] = $content;
-        $this->isFirstAddOfRow = false;
+        $this->isFirstSetOfRow = false;
     }
 
     /**
@@ -23,10 +23,9 @@ class Map
      */
     public function add($content)
     {
-        if (!$this->isFirstAddOfRow) {
+        if (!$this->isFirstSetOfRow) {
             $this->nextcolumn();
         }
-        $this->isFirstAddOfRow = false;
         $this->set($content);
 
         return $this;
@@ -104,7 +103,7 @@ class Map
         $this->row++;
         if (true !== $keepColumn) {
             $this->column = 0;
-            $this->isFirstAddOfRow = true;
+            $this->isFirstSetOfRow = true;
         }
 
         return $this;
