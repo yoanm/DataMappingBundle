@@ -4,8 +4,17 @@ namespace Yoanm\DataMappingBundle\Model;
 
 class Map
 {
+    /**
+     * @var array
+     */
     private $map = array();
+    /**
+     * @var int
+     */
     private $column = null;
+    /**
+     * @var int
+     */
     private $row = null;
     
     /**** GET/SET content helpers for current slot ***/
