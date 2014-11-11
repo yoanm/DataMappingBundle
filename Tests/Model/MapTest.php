@@ -62,6 +62,12 @@ class MapTest extends ProphecyTestCase
                         3 => "F",
                         4 => "G",
                         6 => "H",
+                    ),
+                    3 => array(
+                        2 => 2,
+                        3 => 5.3,
+                        4 => -2,
+                        6 => 0,
                     )
                 )
             )
