@@ -4,7 +4,8 @@ namespace Yoanm\DataMappingBundle\Model;
 
 class Map
 {
-
+    const ROOT_SLOT_TO_MAP_ROOT_KEY = 'root';
+    const ROOT_SLOT_TO_MAP_CHILDS_KEY = 'childs';
     /**
      * Array containing slots objects
      * Structure : [
@@ -20,21 +21,24 @@ class Map
 
     /**
      * Array with the same structure a $map but slots present in this array are root slot of the current slot.
-     * An object defined in this array for current position mean that current position in on an merged slot.
-     * The object is root slot the top left slot of the merged area
+     * An object defined in this array for current position mean that current position in on an spanned slot.
+     * The object is root slot the top left slot of the spanned area
      * @var array
      */
     private $mapToRootSlot = array();
 
     /**
-     * An array to keep a reference on the child slots (e.g merged slots) for a root slot
+     * An array to keep a reference on the child slots (e.g spanned slots) for a root slot
      * Structure : [
      *      OBJECT_HASH: [
-     *          ROW_NUMBER . ':' . COLUMN_NUMBER: [
-     *              ROW_NUMBER,
-     *              COL_NUMBER
-     *          ],
-     *          ...
+     *          Map::ROOT_SLOT_TO_MAP_ROOT_KEY: [ROW_NUMBER, COLUMN_NUMBER],
+     *          Map::ROOT_SLOT_TO_MAP_CHILDS_KEY: [
+     *              ROW_NUMBER . ':' . COLUMN_NUMBER: [
+     *                  ROW_NUMBER,
+     *                  COL_NUMBER
+     *              ],
+     *              ...
+     *          ]
      *      ],
      *      ...
      * ]
@@ -83,65 +87,26 @@ class Map
     }
 
     /**
-     * @param int $count a positive integer
+     * @param int $columnCount column count to span from root slot column, can be 1 to unspan
      *
      * @throws \BadMethodCallException if slot position is not valid
      * @throws \InvalidArgumentException if $count is not a positive integer
      *
      * @return Map
      */
-    public function colspan($count)
-    {
-        $this->merge((string)$count);
-
-        return $this;
-    }
-
-    /**
-     *
-     * @throws \BadMethodCallException if slot position is not valid
-     * @throws \InvalidArgumentException if $count is not a positive integer
-     *
-     * @param string $targetPosition
-     *  - 'X' : X is a positive integer
-     *
-     * @return Map
-     */
-    public function merge($targetPosition)
-    {
+    public function colspan($columnCount) {
         $this->exist(true);
 
-        $columnCount = abs((int)$targetPosition);
-        if ($targetPosition <= 0) {
+        if ($columnCount <= 0) {
             throw new \InvalidArgumentException('$targetPosition must be a positive integer');
         }
 
-        $startColumn = ($this->getColumn() + 1);
-        $endColumn = ($this->getColumn() + $columnCount);
+        $columnCount = (int)$columnCount;
 
-        if (!$this->isDefined()) {
-            //Slot not already defined
-            $this->setSlot(new Slot());
-        }
-        $rootSlot = $this->getSlot();
-        $currentRow = $this->getRow();
-
-
-        $hash = spl_object_hash($rootSlot);
-
-        if (!array_key_exists($currentRow, $this->mapToRootSlot[$hash])) {
-            $this->mapToRootSlot[$currentRow] = array();
-        }
-
-        if (!array_key_exists($hash, $this->rootSlotToMap)) {
-            $this->rootSlotToMap[$hash] = array();
-        }
-
-        for ($column = $startColumn; $column < $endColumn ; $column++) {
-            $this->map[$currentRow][$startColumn] = $rootSlot;//just a reference because $rootSlot is an object ;)
-            $this->mapToRootSlot[$currentRow][$column] = $rootSlot;//just a reference because $rootSlot is an object ;)
-
-            $this->rootSlotToMap[$hash][$currentRow . ':' . $column] = array($currentRow, $column);
+        if($columnCount > 1) {
+            $this->spanColumn($columnCount);
+        } else {
+            $this->unspanColumn();
         }
 
         return $this;
@@ -159,7 +124,15 @@ class Map
 
         $this->exist(true);
 
-        unset($this->map[$this->getRow()][$this->getColumn()]);
+        if ($this->isDefined()) {
+            if ($this->isSpan()) {
+                throw new \BadMethodCallException('You cannot reset a spanned slot, unspan it instead');
+            }
+            $this->colspan(0);//unspan
+            $this->unsetSlotAt($this->getRow(), $this->getColumn());
+
+        }
+
 
         return $this;
     }
@@ -209,6 +182,56 @@ class Map
         );
     }
 
+    public function isSpan()
+    {
+        $this->exist(true);
+
+        $row = $this->getRow();
+        $column = $this->getColumn();
+        return (
+            $this->isDefined()
+            && array_key_exists($row, $this->mapToRootSlot)
+            && array_key_exists($column, $this->mapToRootSlot[$row])
+        );
+    }
+
+    public function getRootPosition()
+    {
+        if (!$this->hasSpan()) {
+            //Is not a span, is a simple slot
+            return array($this->getRow(), $this->getColumn());
+        }
+
+        $hash = spl_object_hash($this->getSlot());
+
+        return $this->rootSlotToMap[$hash][self::ROOT_SLOT_TO_MAP_ROOT_KEY];
+    }
+
+    public function getChildsPosition()
+    {
+        if (!$this->hasSpan()) {
+            return array();
+        }
+
+        $hash = spl_object_hash($this->getSlot());
+
+        return $this->rootSlotToMap[$hash][self::ROOT_SLOT_TO_MAP_CHILDS_KEY];
+    }
+
+    public function hasSpan()
+    {
+        $this->exist(true);
+
+        if ( !$this->isDefined()) {
+            return false;
+        }
+        $hash = spl_object_hash($this->getSlot());
+        return (
+            array_key_exists($hash, $this->rootSlotToMap)
+            && sizeof(($this->rootSlotToMap[$hash][self::ROOT_SLOT_TO_MAP_CHILDS_KEY]))
+        );
+    }
+
     /**
      * @abstract return the current Slot
      *
@@ -218,13 +241,11 @@ class Map
      */
     public function get()
     {
-        $slot = $this->getSlot();
-
-        if(!$slot) {
+        if(!$this->isDefined()) {
             return false;
         }
 
-        return $slot->getContent();
+        return $this->getSlot()->getContent();
     }
 
 
@@ -232,7 +253,7 @@ class Map
     /**** slot/row management helpers ***/
 
     /**
-     * @abstract helper function set position on next slot
+     * @abstract helper function set position on next slot, function will check if
      *
      * @param null|string|numeric $content content for the slot [OPTIONAL]
      *
@@ -247,6 +268,9 @@ class Map
             $this->goColumn('+1');
         } else {
             $this->setColumn(0);
+        }
+        while($this->isSpan()) {
+            $this->goColumn('+1');
         }
         if (null !== $content) {
             $this->set($content);
@@ -379,6 +403,11 @@ class Map
 
     /**** debug ****/
 
+    /**
+     * @deprecated will be removed in 2.0.0
+     *
+     * @return array
+     */
     public function debug()
     {
         return $this->map;
@@ -393,7 +422,7 @@ class Map
     {
         $this->exist(true);
 
-        return $this->map[$this->getRow()][$this->getColumn()];
+        return $this->getSlotAt($this->getRow(), $this->getColumn());
     }
 
     /**
@@ -405,7 +434,166 @@ class Map
     {
         $this->exist(true);
 
-        $this->map[$this->getRow()][$this->getColumn()] = $slot;
+        $this->setSlotAt($slot, $this->getRow(), $this->getColumn());
+
+        return $this;
+    }
+
+    /**
+     * @return Slot
+     */
+    private function getSlotAt($row, $column)
+    {
+        return $this->map[$row][$column];
+    }
+
+    /**
+     * @param Slot $slot
+     *
+     * @return Map
+     */
+    private function setSlotAt(Slot $slot, $row, $column)
+    {
+        $this->map[$row][$column] = $slot;
+
+        return $this;
+    }
+
+    /**
+     * @param int $row
+     * @param int $column
+     *
+     * @return Map
+     */
+    private function unsetSlotAt($row, $column)
+    {
+        unset($this->map[$row][$column]);
+
+        return $this;
+    }
+
+    /**
+     * @param Slot  $rootSlot
+     * @param int   $row
+     * @param int   $column
+     *
+     * @return Map
+     */
+    private function setSpanSlotAt(Slot $rootSlot, $row, $column)
+    {
+        $this->setSlotAt($rootSlot, $row, $column);//just a reference because $rootSlot is an object ;)
+        $this->mapToRootSlot[$row][$column] = $rootSlot;//just a reference because $rootSlot is an object ;)
+
+        $this->rootSlotToMap[spl_object_hash($rootSlot)][self::ROOT_SLOT_TO_MAP_CHILDS_KEY][$row . ':' . $column] = array($row, $column);
+
+        return $this;
+    }
+
+    /**
+     * @param Slot  $rootSlot
+     * @param int   $row
+     * @param int   $column
+     *
+     * @return Map
+     */
+    private function unsetSpanSlotAt(Slot $rootSlot, $row, $column)
+    {
+        $this->unsetSlotAt($row, $column);
+        unset($this->mapToRootSlot[$row][$column]);
+        unset($this->rootSlotToMap[spl_object_hash($rootSlot)][self::ROOT_SLOT_TO_MAP_CHILDS_KEY][$row . ':' . $column]);
+
+        return $this;
+    }
+
+    /**
+     * @param int $columnCount
+     *
+     * @return Map
+     */
+    private function spanColumn($columnCount)
+    {
+        $this->exist(true);
+
+        if ($columnCount > 0) {
+            if (!$this->isDefined()) {
+                //Slot not already defined
+                $this->setSlot(new Slot());
+            }
+            $rootSlot = $this->getSlot();
+            $currentRow = $this->getRow();
+            $rootPosition = $this->getRootPosition();
+            $startColumn = $rootPosition[1];
+
+            $firstColumnToSpan = ($startColumn + 1);
+            $lastColumnToSpan = ($startColumn + $columnCount - 1);
+            if ($this->hasSpan()) {
+                //unspan all columns to span it again. Easier to make difference between existing and what user want
+                $this->unspanColumn();
+            }
+
+            if ($columnCount > 1) {
+                $hash = spl_object_hash($rootSlot);
+
+                if (!array_key_exists($currentRow, $this->mapToRootSlot)) {
+                    $this->mapToRootSlot[$currentRow] = array();
+                }
+
+                if (!array_key_exists($hash, $this->rootSlotToMap)) {
+                    $this->rootSlotToMap[$hash] = array(
+                        self::ROOT_SLOT_TO_MAP_ROOT_KEY => array($currentRow, $this->getColumn()),
+                        self::ROOT_SLOT_TO_MAP_CHILDS_KEY => array()
+                    );
+                }
+
+                for ($column = $firstColumnToSpan; $column <= $lastColumnToSpan; $column += 1) {
+                    $this->setSpanSlotAt($rootSlot, $currentRow, $column);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Map
+     */
+    private function unspanColumn()
+    {
+        $this->exist(true);
+
+        if (!$this->hasSpan()) {
+            //nothing to unspan
+            return $this;
+        }
+        //unspan all spanned columns
+        $childsPosition = $this->getChildsPosition();
+        $rootPosition = $this->getRootPosition();
+        $rootSlot = $this->getSlot();
+
+        $firstSpandColumn = ($rootPosition[1] + 1);
+        foreach ($childsPosition as $aChildPosition) {
+            if ($aChildPosition[1] < $firstSpandColumn) {
+                //do not unspan column equal to root column because root slot can have a rowspan
+                continue;
+            }
+            $this->unsetSpanSlotAt($rootSlot, $aChildPosition[0], $aChildPosition[1]);
+        }
+        if (!$this->hasSpan()) {
+            $this->unsetSpanFor($rootSlot);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Slot $rootSlot
+     *
+     * @return Map
+     */
+    private function unsetSpanFor(Slot $rootSlot)
+    {
+        $hash = spl_object_hash($rootSlot);
+        unset($this->rootSlotToMap[$hash]);
 
         return $this;
     }
