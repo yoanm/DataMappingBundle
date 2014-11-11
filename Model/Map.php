@@ -165,18 +165,15 @@ class Map
      * @throws \InvalidArgumentException if column or row are not good
      *
      * @param int|string        $column the column number (from 0) or a string starting with + or - sign followed by an integer
-     * @param null|int|string   $row the row number (from 0) or a string starting with + or - sign followed by an integer
+     * @param int|string   $row the row number (from 0) or a string starting with + or - sign followed by an integer
      *
      * @return Map
      */
-    public function go($column, $row=null)
+    public function go($row, $column)
     {
-        $this->goColumn($column);
-
-        if (null !== $row) {
-            $this->goRow($row);
-        }
-        return $this;
+        return $this
+            ->goColumn($column)
+            ->goRow($row);
 
     }
 
