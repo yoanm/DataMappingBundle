@@ -41,7 +41,7 @@ Map can be use like an HTML table with the helper functions `row()` and `slot([S
 
 Calling `row()` will set row position to the next row. Basically, after an instanciation `row()` will set row position to the first row, other call will increase the row position.
 
-Calling `slot([SLOT_CONTENT])` will set column position to the next column. Basically, after an instanciation `slot([SLOT_CONTENT])` will set column position to the first column (first slot of the row), other call will increase the column position on the current row.
+Calling `slot([SLOT_CONTENT])` will set column position to the next column. Basically, after a `row()` call, `slot([SLOT_CONTENT])` will set column position to the first column (first slot of the row), other call will increase the column position on the current row.
 
 Example to reflect this table : 
 
