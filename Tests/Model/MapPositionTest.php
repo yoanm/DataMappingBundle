@@ -86,11 +86,11 @@ class MapPositionTest extends ProphecyTestCase
         $this->assertSame($this->map->getRow(), 3);
         $this->assertSame($this->map->getColumn(), 2);
 
-        $this->map->go(1, 4);
+        $this->map->go(4, 1);
         $this->assertSame($this->map->getRow(), 4);
         $this->assertSame($this->map->getColumn(), 1);
 
-        $this->map->go('+3', '-2');
+        $this->map->go('-2', '+3');
         $this->assertSame($this->map->getRow(), 2);
         $this->assertSame($this->map->getColumn(), 4);
 
