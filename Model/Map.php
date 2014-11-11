@@ -20,11 +20,12 @@ class Map
     /**** GET/SET content helpers for current slot ***/
 
     /**
-     * @abstract set current slot content
+     * @abstract set current slot content or a slot object
      *
      * @throws \BadMethodCallException if slot position is not valid
+     * @throws \InvalidArgumentException is $content is not a string, a numeric or Slot object
      *
-     * @param mixed $content
+     * @param string|numeric|Slot $content
      *
      * @return Map
      */
@@ -32,11 +33,25 @@ class Map
     {
 
         $this->exist(true);
+
+        $isSlotObj = (is_object($content) && content instanceof Slot);
+
+        if(!is_numeric($content) && !is_string($content) && !$isSlotObj)
+        {
+            throw new \InvalidArgumentException(sprintf('$content must be a string, a numeric or a Slot object, \'%s\' given', gettype($content)));
+        }
+
+        if (!$isSlotObj) {
+            $content = new Slot($content);
+        }
         
         $this->map[$this->getRow()][$this->getColumn()] = $content;
 
         return $this;
     }
+
+
+    
 
     /**
      * @abstract unset current slot content
@@ -97,11 +112,11 @@ class Map
     }
 
     /**
-     * @abstract return the current slot content
+     * @abstract return the current Slot
      *
      * @throws \BadMethodCallException if slot position is not valid
      *
-     * @return string|bool false if slot is not defined else the slot content
+     * @return Slot
      */
     public function get()
     {
@@ -121,7 +136,9 @@ class Map
     /**
      * @abstract helper function set position on next slot
      *
-     * @param null|mixed $content content for the slot if defined
+     * @param null|string|numeric|slot $content content for the slot if defined
+     *
+     * @throws \InvalidArgumentException is $content is not null and not a string, a numeric or Slot object
      *
      * @return Map
      */

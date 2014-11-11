@@ -247,7 +247,7 @@ class MapTest extends ProphecyTestCase
 
         foreach ($data as $rowData) {
             foreach ($rowData as $slotData) {
-                $this->assertSame($this->map->get(), $slotData);
+                $this->assertSame($this->map->get()->getContent(), $slotData);
                 $this->map->goColumn();
             }
             $this->map->goRow();
@@ -275,7 +275,7 @@ class MapTest extends ProphecyTestCase
             $this->map->goRow($row);
             foreach ($rowData as $column=>$slotData) {
                 $this->map->goColumn($column);
-                $this->assertSame($this->map->get(), $slotData);
+                $this->assertSame($this->map->get()->getContent(), $slotData);
             }
         }
     }
@@ -342,7 +342,15 @@ class MapTest extends ProphecyTestCase
             $this->map->slot($slotData);
         }
 
-        $this->assertSame($this->map->debug(), $expected);
+
+
+        foreach ($expected as $row=>$rowData) {
+            $this->map->goRow($row);
+            foreach ($rowData as $column=>$slotData) {
+                $this->map->goColumn($column);
+                $this->assertSame($this->map->get()->getContent(), $slotData);
+            }
+        }
     }
 
 
