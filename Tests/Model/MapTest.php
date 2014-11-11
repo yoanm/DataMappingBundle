@@ -37,7 +37,7 @@ class MapTest extends ProphecyTestCase
 
         foreach ($data as $rowData) {
             foreach ($rowData as $slotData) {
-                $this->assertSame($this->map->get()->getContent(), $slotData);
+                $this->assertSame($this->map->get(), $slotData);
                 $this->map->goColumn();
             }
             $this->map->goRow();

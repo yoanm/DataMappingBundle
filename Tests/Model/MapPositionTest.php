@@ -117,7 +117,7 @@ class MapPositionTest extends ProphecyTestCase
             $this->map->goRow($row);
             foreach ($rowData as $column=>$slotData) {
                 $this->map->goColumn($column);
-                $this->assertSame($this->map->get()->getContent(), $slotData);
+                $this->assertSame($this->map->get(), $slotData);
             }
         }
     }
@@ -188,7 +188,7 @@ class MapPositionTest extends ProphecyTestCase
             $this->map->goRow($row);
             foreach ($rowData as $column=>$slotData) {
                 $this->map->goColumn($column);
-                $this->assertSame($this->map->get()->getContent(), $slotData);
+                $this->assertSame($this->map->get(), $slotData);
             }
         }
     }

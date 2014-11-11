@@ -4,10 +4,44 @@ namespace Yoanm\DataMappingBundle\Model;
 
 class Map
 {
+
     /**
+     * Array containing slots objects
+     * Structure : [
+     *      ROW_NUMBER: [
+     *          COLUMN_NUMBER: Slot object,
+     *          ...
+     *      ],
+     *      ...
+     * ]
      * @var array
      */
     private $map = array();
+
+    /**
+     * Array with the same structure a $map but slots present in this array are root slot of the current slot.
+     * An object defined in this array for current position mean that current position in on an merged slot.
+     * The object is root slot the top left slot of the merged area
+     * @var array
+     */
+    private $mapToRootSlot = array();
+
+    /**
+     * An array to keep a reference on the child slots (e.g merged slots) for a root slot
+     * Structure : [
+     *      OBJECT_HASH: [
+     *          ROW_NUMBER . ':' . COLUMN_NUMBER: [
+     *              ROW_NUMBER,
+     *              COL_NUMBER
+     *          ],
+     *          ...
+     *      ],
+     *      ...
+     * ]
+     * @var array
+     */
+    private $rootSlotToMap = array();
+
     /**
      * @var int
      */
@@ -25,7 +59,7 @@ class Map
      * @throws \BadMethodCallException if slot position is not valid
      * @throws \InvalidArgumentException is $content is not a string, a numeric or Slot object
      *
-     * @param string|numeric|Slot $content
+     * @param string|numeric $content
      *
      * @return Map
      */
@@ -34,24 +68,84 @@ class Map
 
         $this->exist(true);
 
-        $isSlotObj = (is_object($content) && content instanceof Slot);
-
-        if(!is_numeric($content) && !is_string($content) && !$isSlotObj)
+        if(!is_numeric($content) && !is_string($content))
         {
-            throw new \InvalidArgumentException(sprintf('$content must be a string, a numeric or a Slot object, \'%s\' given', gettype($content)));
+            throw new \InvalidArgumentException(sprintf('$content must be a string or a numeric, \'%s\' given', gettype($content)));
         }
 
-        if (!$isSlotObj) {
-            $content = new Slot($content);
+        if (!$this->isDefined()) {
+            $this->setSlot(new Slot($content));
+        } else {
+            $this->getSlot()->setContent($content);
         }
-        
-        $this->map[$this->getRow()][$this->getColumn()] = $content;
 
         return $this;
     }
 
+    /**
+     * @param int $count a positive integer
+     *
+     * @throws \BadMethodCallException if slot position is not valid
+     * @throws \InvalidArgumentException if $count is not a positive integer
+     *
+     * @return Map
+     */
+    public function colspan($count)
+    {
+        $this->merge((string)$count);
 
-    
+        return $this;
+    }
+
+    /**
+     *
+     * @throws \BadMethodCallException if slot position is not valid
+     * @throws \InvalidArgumentException if $count is not a positive integer
+     *
+     * @param string $targetPosition
+     *  - 'X' : X is a positive integer
+     *
+     * @return Map
+     */
+    public function merge($targetPosition)
+    {
+        $this->exist(true);
+
+        $columnCount = abs((int)$targetPosition);
+        if ($targetPosition <= 0) {
+            throw new \InvalidArgumentException('$targetPosition must be a positive integer');
+        }
+
+        $startColumn = ($this->getColumn() + 1);
+        $endColumn = ($this->getColumn() + $columnCount);
+
+        if (!$this->isDefined()) {
+            //Slot not already defined
+            $this->setSlot(new Slot());
+        }
+        $rootSlot = $this->getSlot();
+        $currentRow = $this->getRow();
+
+
+        $hash = spl_object_hash($rootSlot);
+
+        if (!array_key_exists($currentRow, $this->mapToRootSlot[$hash])) {
+            $this->mapToRootSlot[$currentRow] = array();
+        }
+
+        if (!array_key_exists($hash, $this->rootSlotToMap)) {
+            $this->rootSlotToMap[$hash] = array();
+        }
+
+        for ($column = $startColumn; $column < $endColumn ; $column++) {
+            $this->map[$currentRow][$startColumn] = $rootSlot;//just a reference because $rootSlot is an object ;)
+            $this->mapToRootSlot[$currentRow][$column] = $rootSlot;//just a reference because $rootSlot is an object ;)
+
+            $this->rootSlotToMap[$hash][$currentRow . ':' . $column] = array($currentRow, $column);
+        }
+
+        return $this;
+    }
 
     /**
      * @abstract unset current slot content
@@ -108,7 +202,11 @@ class Map
         $column = $this->getColumn();
         $row    = $this->getRow();
 
-        return (array_key_exists($row, $this->map) && array_key_exists($column, $this->map[$row]));
+        return (
+            array_key_exists($row, $this->map)
+            && array_key_exists($column, $this->map[$row])
+            && $this->map[$row][$column] instanceof Slot
+        );
     }
 
     /**
@@ -116,17 +214,17 @@ class Map
      *
      * @throws \BadMethodCallException if slot position is not valid
      *
-     * @return Slot
+     * @return mixed false if not defined
      */
     public function get()
     {
-        $this->exist(true);
+        $slot = $this->getSlot();
 
-        if(!$this->isDefined()) {
+        if(!$slot) {
             return false;
         }
 
-        return $this->map[$this->getRow()][$this->getColumn()];
+        return $slot->getContent();
     }
 
 
@@ -136,7 +234,7 @@ class Map
     /**
      * @abstract helper function set position on next slot
      *
-     * @param null|string|numeric|slot $content content for the slot if defined
+     * @param null|string|numeric $content content for the slot [OPTIONAL]
      *
      * @throws \InvalidArgumentException is $content is not null and not a string, a numeric or Slot object
      *
@@ -290,6 +388,30 @@ class Map
     }
 
     /**** private ****/
+
+    /**
+     * @return Slot
+     */
+    private function getSlot()
+    {
+        $this->exist(true);
+
+        return $this->map[$this->getRow()][$this->getColumn()];
+    }
+
+    /**
+     * @param Slot $slot
+     *
+     * @return Map
+     */
+    private function setSlot(Slot $slot)
+    {
+        $this->exist(true);
+
+        $this->map[$this->getRow()][$this->getColumn()] = $slot;
+
+        return $this;
+    }
 
     /**
      * @param int $row

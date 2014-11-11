@@ -41,5 +41,4 @@ class Slot {
 
         return $this;
     }
-
-} 
+}
