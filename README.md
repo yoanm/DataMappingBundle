@@ -14,7 +14,7 @@ $map
   ->goColumn(COLUMN)
   ->goRow(ROW)
 ```
-**Warning : column and row content start at 0**
+**Warning : column and row position start at 0**
 ### Slot content
 When a slot is selected you can modify it with following functions : 
    - `set($content)` : set the slot content
@@ -35,13 +35,13 @@ Current position is 2nd column, 4th row (column index 1, row index 3).
  - Moving to 5th column, 2nd row  : ```$map->go('-2', '+3')```
 
 ## HTML Table behavior
-Map can be use like an HTML table with the helper functions `row()` and '`slot([SLOT_CONTENT])`.
+Map can be use like an HTML table with the helper functions `row()` and `slot([SLOT_CONTENT])`.
 
 **Warning : `slot([SLOT_CONTENT])` will throw an exception if a row position has not been defined, i.e. if `row()` or `go(ROW, COLUMN)`, `goRow(ROW)` functions are not called before.**
 
 Calling `row()` will set row position to the next row. Basically, after an instanciation `row()` will set row position to the first row, other call will increase the row position.
 
-Calling `slot([SLOT_CONTENT])` will set column position to the next column. Basically, after an instanciation `slot([SLOT_CONTENT])` will set column position to the first column (first slot of the row), other call will increase the column position on the current row.
+Calling `slot([SLOT_CONTENT])` will set column position to the next column. Basically, after a `row()` call, `slot([SLOT_CONTENT])` will set column position to the first column (first slot of the row), other call will increase the column position on the current row.
 
 Example to reflect this table : 
 

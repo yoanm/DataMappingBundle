@@ -35,15 +35,16 @@ class MapTest extends ProphecyTestCase
 
         $this->map->go(0, 0);
 
-        foreach ($data as $rowData) {
-            foreach ($rowData as $slotData) {
-                $this->assertSame($this->map->get(), $slotData);
+        foreach ($data as $row=>$rowData) {
+            foreach ($rowData as $column=>$slotData) {
+                $this->assertSame($this->map->get(), $slotData, 'assert get for ' . $row . ':' . $column);
                 $this->map->goColumn();
             }
             $this->map->goRow();
             $this->map->goColumn(0);
         }
     }
+
 
     public function getBaseData()
     {
@@ -61,6 +62,12 @@ class MapTest extends ProphecyTestCase
                         3 => "F",
                         4 => "G",
                         6 => "H",
+                    ),
+                    3 => array(
+                        2 => 2,
+                        3 => 5.3,
+                        4 => -2,
+                        6 => 0,
                     )
                 )
             )
