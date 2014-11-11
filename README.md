@@ -7,14 +7,14 @@ Allows data mapping into a table structure
 ## Basic usage
 ### Position
 First you must select a slot in a row. Two way to do it : 
- - One call using `$map->go(COLUMN, ROW)`
+ - One call using `$map->go(ROW, COLUMN)`
  - Two calls by first defining column or row and then the other one 
 ```php
 $map
   ->goColumn(COLUMN)
   ->goRow(ROW)
 ```
-**Warning : column and row content start at 0**
+**Warning : column and row position start at 0**
 ### Slot content
 When a slot is selected you can modify it with following functions : 
    - `set($content)` : set the slot content
@@ -26,22 +26,22 @@ When a slot is selected you can modify it with following functions :
 **Warning : Function `set($content)`, `get()`, `isDefined()` and `reset()` will throw an exception if no valid slot position is defined, i.e. if `exist()` return false calling this functions will throw an exception.**
 
 ## Relative move
-Function `go(COLUMN, [ROW])`, `goColumn(COLUMN)` and `goRow(ROW)` accept column/row index but also accept a moving step count relative to the current slot position.
+Function `go(ROW, COLUMN)`, `goColumn(COLUMN)` and `goRow(ROW)` accept column/row index but also accept a moving step count relative to the current slot position.
 
 Example : 
 Current position is 2nd column, 4th row (column index 1, row index 3). 
  - Moving to 5th column, same row : ```$map->goColumn('+3')```
  - Moving to 2nd row, same column : ```$map->goRow('-2')```
- - Moving to 5th column, 2nd row  : ```$map->go('+3', '-2')```
+ - Moving to 5th column, 2nd row  : ```$map->go('-2', '+3')```
 
 ## HTML Table behavior
-Map can be use like an HTML table with the helper functions `row()` and '`slot([SLOT_CONTENT])`.
+Map can be use like an HTML table with the helper functions `row()` and `slot([SLOT_CONTENT])`.
 
-**Warning : `slot([SLOT_CONTENT])` will throw an exception if a row position has not been defined, i.e. if `row()` or `go(COLUMN, ROW)`, `goRow(ROW)` functions are not called before.**
+**Warning : `slot([SLOT_CONTENT])` will throw an exception if a row position has not been defined, i.e. if `row()` or `go(ROW, COLUMN)`, `goRow(ROW)` functions are not called before.**
 
 Calling `row()` will set row position to the next row. Basically, after an instanciation `row()` will set row position to the first row, other call will increase the row position.
 
-Calling `slot([SLOT_CONTENT])` will set column position to the next column. Basically, after an instanciation `slot([SLOT_CONTENT])` will set column position to the first column (first slot of the row), other call will increase the column position on the current row.
+Calling `slot([SLOT_CONTENT])` will set column position to the next column. Basically, after a `row()` call, `slot([SLOT_CONTENT])` will set column position to the first column (first slot of the row), other call will increase the column position on the current row.
 
 Example to reflect this table : 
 
