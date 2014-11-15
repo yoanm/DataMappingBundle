@@ -148,4 +148,30 @@ class MapExceptionTest extends ProphecyTestCase
             ->row()
                 ->get();
     }
+
+    public function testColspanException()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map->colspan(1);
+    }
+
+    public function testColspanException2()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map
+            ->row()
+            ->slot()
+            ->set('test')
+            ->row()
+            ->colspan(1);
+    }
+
+    public function testColspanException3()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\InvalidArgumentException');
+        $this->map->go(0,0)->colspan(0);
+    }
 }
