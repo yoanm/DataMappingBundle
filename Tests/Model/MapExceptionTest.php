@@ -174,4 +174,23 @@ class MapExceptionTest extends ProphecyTestCase
         $this->setExpectedException('\InvalidArgumentException');
         $this->map->go(0,0)->colspan(0);
     }
+
+    public function testisSpanException()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map->isSpan();
+    }
+
+    public function testisSpanException2()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map
+            ->row()
+            ->slot()
+            ->set('test')
+            ->row()
+            ->isSpan();
+    }
 }
