@@ -148,4 +148,106 @@ class MapExceptionTest extends ProphecyTestCase
             ->row()
                 ->get();
     }
+
+    public function testColspanException()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map->colspan(1);
+    }
+
+    public function testColspanException2()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map
+            ->row()
+            ->slot()
+            ->set('test')
+            ->row()
+            ->colspan(1);
+    }
+
+    public function testColspanException3()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\InvalidArgumentException');
+        $this->map->go(0,0)->colspan(0);
+    }
+
+    public function testIsSpanException()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map->isSpan();
+    }
+
+    public function testIsSpanException2()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map
+            ->row()
+            ->slot()
+            ->set('test')
+            ->row()
+            ->isSpan();
+    }
+
+    public function testHasSpanException()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map->hasSpan();
+    }
+
+    public function testHasSpanException2()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map
+            ->row()
+            ->slot()
+            ->set('test')
+            ->row()
+            ->hasSpan();
+    }
+
+    public function testGetRootPositionException()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map->getRootPosition();
+    }
+
+    public function testGetRootPositionException2()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map
+            ->row()
+            ->slot()
+            ->set('test')
+            ->row()
+            ->getRootPosition();
+    }
+
+    public function testGetChildsPositionException()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map->getChildsPosition();
+    }
+
+    public function testGetChildsPositionException2()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map
+            ->row()
+            ->slot()
+            ->set('test')
+            ->row()
+            ->getChildsPosition();
+    }
 }
