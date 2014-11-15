@@ -193,4 +193,23 @@ class MapExceptionTest extends ProphecyTestCase
             ->row()
             ->isSpan();
     }
+
+    public function testhasSpanException()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map->hasSpan();
+    }
+
+    public function testhasSpanException2()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map
+            ->row()
+            ->slot()
+            ->set('test')
+            ->row()
+            ->hasSpan();
+    }
 }
