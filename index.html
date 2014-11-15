@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Datamappingbundle by yoanm</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Datamappingbundle</h1>
+        <h2>Allows data mapping into a table structure</h2>
+        <a href="https://github.com/yoanm/DataMappingBundle" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="datamappingbundle" class="anchor" href="#datamappingbundle" aria-hidden="true"><span class="octicon octicon-link"></span></a>DataMappingBundle</h1>
+
+<p>Allows data mapping into a table structure</p>
+
+<h1>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h1>
+
+<h2>
+<a id="basic-usage" class="anchor" href="#basic-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basic usage</h2>
+
+<h3>
+<a id="position" class="anchor" href="#position" aria-hidden="true"><span class="octicon octicon-link"></span></a>Position</h3>
+
+<p>First you must select a slot in a row. Two way to do it : </p>
+
+<ul>
+<li>One call using <code>$map-&gt;go(ROW, COLUMN)</code>
+</li>
+<li>Two calls by first defining column or row and then the other one </li>
+</ul>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-v"><span class="pl-pdv">$</span>map</span></span>
+<span class="pl-s2">  <span class="pl-ko">-&gt;</span>goColumn(<span class="pl-c1">COLUMN</span>)</span>
+<span class="pl-s2">  <span class="pl-ko">-&gt;</span>goRow(<span class="pl-c1">ROW</span>)</span></pre></div>
+
+<p><strong>Warning : column and row position start at 0</strong></p>
+
+<h3>
+<a id="slot-content" class="anchor" href="#slot-content" aria-hidden="true"><span class="octicon octicon-link"></span></a>Slot content</h3>
+
+<p>When a slot is selected you can modify it with following functions : </p>
+
+<ul>
+<li>
+<code>set($content)</code> : set the slot content</li>
+<li>
+<code>get()</code> : get the slot content</li>
+<li>
+<code>isDefined()</code> : will return true if a content is set to the current selected slot else will return false</li>
+<li>
+<code>reset()</code> : will unset the slot (i.e. remove the content). Calling <code>isDefined()</code>after a <code>reset()</code> will return false</li>
+<li>
+<code>exist()</code> : will return true if the current position is a valid slot position. Will return false if it's called just after object instanciation because no position is defined.</li>
+</ul>
+
+<p><strong>Warning : Function <code>set($content)</code>, <code>get()</code>, <code>isDefined()</code> and <code>reset()</code> will throw an exception if no valid slot position is defined, i.e. if <code>exist()</code> return false calling this functions will throw an exception.</strong></p>
+
+<h2>
+<a id="relative-move" class="anchor" href="#relative-move" aria-hidden="true"><span class="octicon octicon-link"></span></a>Relative move</h2>
+
+<p>Function <code>go(ROW, COLUMN)</code>, <code>goColumn(COLUMN)</code> and <code>goRow(ROW)</code> accept column/row index but also accept a moving step count relative to the current slot position.</p>
+
+<p>Example : 
+Current position is 2nd column, 4th row (column index 1, row index 3). </p>
+
+<ul>
+<li>Moving to 5th column, same row : <code>$map-&gt;goColumn('+3')</code>
+</li>
+<li>Moving to 2nd row, same column : <code>$map-&gt;goRow('-2')</code>
+</li>
+<li>Moving to 5th column, 2nd row  : <code>$map-&gt;go('-2', '+3')</code>
+</li>
+</ul>
+
+<h2>
+<a id="html-table-behavior" class="anchor" href="#html-table-behavior" aria-hidden="true"><span class="octicon octicon-link"></span></a>HTML Table behavior</h2>
+
+<p>Map can be use like an HTML table with the helper functions <code>row()</code> and <code>slot([SLOT_CONTENT])</code>.</p>
+
+<p><strong>Warning : <code>slot([SLOT_CONTENT])</code> will throw an exception if a row position has not been defined, i.e. if <code>row()</code> or <code>go(ROW, COLUMN)</code>, <code>goRow(ROW)</code> functions are not called before.</strong></p>
+
+<p>Calling <code>row()</code> will set row position to the next row. Basically, after an instanciation <code>row()</code> will set row position to the first row, other call will increase the row position.</p>
+
+<p>Calling <code>slot([SLOT_CONTENT])</code> will set column position to the next column. Basically, after a <code>row()</code> call, <code>slot([SLOT_CONTENT])</code> will set column position to the first column (first slot of the row), other call will increase the column position on the current row.</p>
+
+<p>Example to reflect this table : </p>
+
+<table>
+ <tr>
+  <td>A</td>
+  <td>B</td>
+  <td>C</td>
+ </tr>
+ <tr>
+  <td>D</td>
+  <td>E</td>
+  <td>F</td>
+ </tr>
+</table>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-c"><span class="pl-pdc">/*</span>* @var Yoanm\DataMapping\Model\Map $map <span class="pl-pdc">*/</span></span></span>
+<span class="pl-s2"><span class="pl-v"><span class="pl-pdv">$</span>map</span><span class="pl-ko">-&gt;</span></span>
+<span class="pl-s2">  <span class="pl-ko">-&gt;</span>row()</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot()</span>
+<span class="pl-s2">      <span class="pl-ko">-&gt;</span>set(<span class="pl-s1"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot()</span>
+<span class="pl-s2">      <span class="pl-ko">-&gt;</span>set(<span class="pl-s1"><span class="pl-pds">'</span>B<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot()</span>
+<span class="pl-s2">      <span class="pl-ko">-&gt;</span>set(<span class="pl-s1"><span class="pl-pds">'</span>C<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">  <span class="pl-ko">-&gt;</span>row()</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot()</span>
+<span class="pl-s2">      <span class="pl-ko">-&gt;</span>set(<span class="pl-s1"><span class="pl-pds">'</span>D<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot()</span>
+<span class="pl-s2">      <span class="pl-ko">-&gt;</span>set(<span class="pl-s1"><span class="pl-pds">'</span>E<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot()</span>
+<span class="pl-s2">      <span class="pl-ko">-&gt;</span>set(<span class="pl-s1"><span class="pl-pds">'</span>F<span class="pl-pds">'</span></span>)</span></pre></div>
+
+<p>And can be simplify by : </p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-c"><span class="pl-pdc">/*</span>* @var Yoanm\DataMapping\Model\Map $map <span class="pl-pdc">*/</span></span></span>
+<span class="pl-s2"><span class="pl-v"><span class="pl-pdv">$</span>map</span><span class="pl-ko">-&gt;</span></span>
+<span class="pl-s2">  <span class="pl-ko">-&gt;</span>row()</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>B<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>C<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">  <span class="pl-ko">-&gt;</span>row()</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>D<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>E<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>F<span class="pl-pds">'</span></span>)</span></pre></div>
+
+<p>If table data are stored in an array : </p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-v"><span class="pl-pdv">$</span>data</span> <span class="pl-ko">=</span> <span class="pl-sf">array</span>(</span>
+<span class="pl-s2">  <span class="pl-sf">array</span>(<span class="pl-s1"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>B<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>C<span class="pl-pds">'</span></span>),</span>
+<span class="pl-s2">  <span class="pl-sf">array</span>(<span class="pl-s1"><span class="pl-pds">'</span>D<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>E<span class="pl-pds">'</span></span>, <span class="pl-s1"><span class="pl-pds">'</span>F<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">);</span>
+<span class="pl-s2"><span class="pl-c"><span class="pl-pdc">/*</span>* @var Yoanm\DataMapping\Model\Map $map <span class="pl-pdc">*/</span></span></span>
+<span class="pl-s2"><span class="pl-k">foreach</span> (<span class="pl-v"><span class="pl-pdv">$</span>data</span> <span class="pl-ko">as</span> <span class="pl-v"><span class="pl-pdv">$</span>rowData</span>) {</span>
+<span class="pl-s2">  <span class="pl-v"><span class="pl-pdv">$</span>map</span><span class="pl-ko">-&gt;</span>row();</span>
+<span class="pl-s2">  <span class="pl-k">foreach</span> (<span class="pl-v"><span class="pl-pdv">$</span>rowData</span> <span class="pl-ko">as</span> <span class="pl-v"><span class="pl-pdv">$</span>slotData</span>) {</span>
+<span class="pl-s2">    <span class="pl-v"><span class="pl-pdv">$</span>map</span><span class="pl-ko">-&gt;</span>slot(<span class="pl-v"><span class="pl-pdv">$</span>slotData</span>);<span class="pl-c"><span class="pl-pdc">//</span>Or $map-&gt;slot()-&gt;set($slotData)</span></span>
+<span class="pl-s2">  }</span>
+<span class="pl-s2">}</span></pre></div>
+
+<h2>
+<a id="colspan" class="anchor" href="#colspan" aria-hidden="true"><span class="octicon octicon-link"></span></a>Colspan</h2>
+
+<p>Map, like HTML table, allow a colspan value to merge some slot columns</p>
+
+<p>Example to reflect this table : </p>
+
+<table>
+ <tr>
+  <td>A</td>
+  <td colspan="3">B</td>
+ </tr>
+ <tr>
+  <td>C</td>
+  <td>D</td>
+  <td>E</td>
+  <td>F</td>
+ </tr>
+ <tr>
+  <td>G</td>
+  <td colspan="2">H</td>
+  <td>I</td>
+ </tr>
+</table>
+
+<div class="highlight highlight-php"><pre><span class="pl-s2"><span class="pl-c"><span class="pl-pdc">/*</span>* @var Yoanm\DataMapping\Model\Map $map <span class="pl-pdc">*/</span></span></span>
+<span class="pl-s2"><span class="pl-v"><span class="pl-pdv">$</span>map</span><span class="pl-ko">-&gt;</span></span>
+<span class="pl-s2">  <span class="pl-ko">-&gt;</span>row()</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>A<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>B<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">      <span class="pl-ko">-&gt;</span>colspan(<span class="pl-cn">3</span>)</span>
+<span class="pl-s2">  <span class="pl-ko">-&gt;</span>row()</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>C<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>D<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>E<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>F<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">  <span class="pl-ko">-&gt;</span>row()</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>G<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>H<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s2">      <span class="pl-ko">-&gt;</span>colspan(<span class="pl-cn">2</span>)</span>
+<span class="pl-s2">    <span class="pl-ko">-&gt;</span>slot(<span class="pl-s1"><span class="pl-pds">'</span>I<span class="pl-pds">'</span></span>)</span></pre></div>
+
+<p><code>colspan()</code> work on the current selected root slot. </p>
+
+<ul>
+<li>Calling <code>colspan()</code> on an invalid slot position will throw an exception.</li>
+<li>Calling <code>colspan()</code> on a merged slot will work on the root slot, e.g. the top left slot of the area.</li>
+</ul>
+
+<p>Some helpers : </p>
+
+<ul>
+<li>
+<code>hasSpan()</code> : return true if current slot position is included in merged area</li>
+<li>
+<code>ìsSpan()</code> : return true if current slot position is include in a merged slot collection. Will return false if it's called on the root slot position.</li>
+<li>
+<code>getRootPosition()</code> : return the root slot position. Return the current position if current slot is the root slot (or has no child slots) or the position of the root slot if current slot is a child slot</li>
+<li>
+<code>getChildsPosition()</code> : return a list of all child slot position</li>
+</ul>
+
+<p><strong>Info</strong> : call <code>colspan(1)</code> to remove a previous colspan.</p>
+
+<p><strong>Info</strong> : calling <code>set(CONTENT)</code> or <code>get()</code> on a child slot will set/get the root slot content</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/yoanm/DataMappingBundle/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/yoanm/DataMappingBundle/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/yoanm/DataMappingBundle"></a> is maintained by <a href="https://github.com/yoanm">yoanm</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
