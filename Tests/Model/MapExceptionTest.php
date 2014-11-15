@@ -231,4 +231,23 @@ class MapExceptionTest extends ProphecyTestCase
             ->row()
             ->getRootPosition();
     }
+
+    public function testGetChildsPositionException()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map->getChildsPosition();
+    }
+
+    public function testGetChildsPositionException2()
+    {
+        $this->assertSame($this->map->exist(), false);
+        $this->setExpectedException('\BadMethodCallException');
+        $this->map
+            ->row()
+            ->slot()
+            ->set('test')
+            ->row()
+            ->getChildsPosition();
+    }
 }
