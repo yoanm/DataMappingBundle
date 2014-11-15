@@ -44,10 +44,18 @@ Calling `row()` will set row position to the next row. Basically, after an insta
 Calling `slot([SLOT_CONTENT])` will set column position to the next column. Basically, after a `row()` call, `slot([SLOT_CONTENT])` will set column position to the first column (first slot of the row), other call will increase the column position on the current row.
 
 Example to reflect this table : 
-
-| A  | B | C |
-| ------------- | ------------- | ------------- |
-| D  | E  | F  |
+<table>
+ <tr>
+  <td>A</td>
+  <td>B</td>
+  <td>C</td>
+ </tr>
+ <tr>
+  <td>D</td>
+  <td>E</td>
+  <td>F</td>
+ </tr>
+</table>
 
 ```php
 /** @var Yoanm\DataMapping\Model\Map $map */
@@ -94,3 +102,58 @@ foreach ($data as $rowData) {
   }
 }
 ```
+## Colspan
+Map, like HTML table, allow a colspan value to merge some slot columns
+
+Example to reflect this table : 
+
+<table>
+ <tr>
+  <td>A</td>
+  <td colspan='3'>B</td>
+ </tr>
+ <tr>
+  <td>C</td>
+  <td>D</td>
+  <td>E</td>
+  <td>F</td>
+ </tr>
+ <tr>
+  <td>G</td>
+  <td colspan='2'>H</td>
+  <td>I</td>
+ </tr>
+</table>
+
+```php
+/** @var Yoanm\DataMapping\Model\Map $map */
+$map->
+  ->row()
+    ->slot('A')
+    ->slot('B')
+      ->colspan(3)
+  ->row()
+    ->slot('C')
+    ->slot('D')
+    ->slot('E')
+    ->slot('F')
+  ->row()
+    ->slot('G')
+    ->slot('H')
+      ->colspan(2)
+    ->slot('I')
+```
+
+`colspan()` work on the current selected root slot. 
+ - Calling `colspan()` on an invalid slot position will throw an exception.
+ - Calling `colspan()` on a merged slot will work on the root slot, e.g. the top left slot of the area.
+
+Some helpers : 
+ - `hasSpan()` : return true if current slot position is included in merged area
+ - `ìsSpan()` : return true if current slot position is include in a merged slot collection. Will return false if it's called on the root slot position.
+ - `getRootPosition()` : return the root slot position. Return the current position if current slot is the root slot (or has no child slots) or the position of the root slot if current slot is a child slot
+ - `getChildsPosition()` : return a list of all child slot position
+
+__Info__ : call `colspan(1)` to remove a previous colspan.
+
+__Info__ : calling `set(CONTENT)` or `get()` on a child slot will set/get the root slot content
