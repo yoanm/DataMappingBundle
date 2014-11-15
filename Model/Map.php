@@ -58,10 +58,10 @@ class Map
     /**** GET/SET content helpers for current slot ***/
 
     /**
-     * @abstract set current slot content or a slot object
+     * @abstract set current slot content
      *
      * @throws \BadMethodCallException if slot position is not valid
-     * @throws \InvalidArgumentException is $content is not a string, a numeric or Slot object
+     * @throws \InvalidArgumentException is $content is not a string or a numeric
      *
      * @param string|numeric $content
      *
@@ -182,6 +182,11 @@ class Map
         );
     }
 
+    /**
+     * @throws \BadMethodCallException if slot position is not valid
+     *
+     * @return bool
+     */
     public function isSpan()
     {
         $this->exist(true);
@@ -195,6 +200,9 @@ class Map
         );
     }
 
+    /**
+     * @return array
+     */
     public function getRootPosition()
     {
         if (!$this->hasSpan()) {
@@ -207,6 +215,9 @@ class Map
         return $this->rootSlotToMap[$hash][self::ROOT_SLOT_TO_MAP_ROOT_KEY];
     }
 
+    /**
+     * @return array
+     */
     public function getChildsPosition()
     {
         if (!$this->hasSpan()) {
@@ -218,6 +229,11 @@ class Map
         return $this->rootSlotToMap[$hash][self::ROOT_SLOT_TO_MAP_CHILDS_KEY];
     }
 
+    /**
+     * @throws \BadMethodCallException if slot position is not valid
+     *
+     * @return bool
+     */
     public function hasSpan()
     {
         $this->exist(true);
@@ -257,7 +273,7 @@ class Map
      *
      * @param null|string|numeric $content content for the slot [OPTIONAL]
      *
-     * @throws \InvalidArgumentException is $content is not null and not a string, a numeric or Slot object
+     * @throws \InvalidArgumentException is $content is not null and not a string or a numeric
      *
      * @return Map
      */
@@ -416,6 +432,8 @@ class Map
     /**** private ****/
 
     /**
+     * @throws \BadMethodCallException if slot position is not valid
+     *
      * @return Slot
      */
     private function getSlot()
@@ -427,6 +445,8 @@ class Map
 
     /**
      * @param Slot $slot
+     *
+     * @throws \BadMethodCallException if slot position is not valid
      *
      * @return Map
      */
@@ -508,6 +528,8 @@ class Map
     /**
      * @param int $columnCount
      *
+     * @throws \BadMethodCallException if slot position is not valid
+     *
      * @return Map
      */
     private function spanColumn($columnCount)
@@ -555,6 +577,8 @@ class Map
     }
 
     /**
+     * @throws \BadMethodCallException if slot position is not valid
+     *
      * @return Map
      */
     private function unspanColumn()
